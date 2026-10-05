@@ -1,0 +1,4 @@
+git clone https://github.com/diegosouzapw/OmniRoute.git
+cd OmniRoute
+npm install
+npm run dev
