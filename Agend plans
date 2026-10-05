@@ -1,0 +1,82 @@
+جيد — سأعطيك طريقة عملية لتشغيل OmniRoute على جهازك مع أقل استهلاك إنترنت ممكن، مع تقديرات للأحجام وأوامر جاهزة (لـ Linux / macOS وWindows PowerShell).
+
+الخلاصة الموصى بها (أقل تحميل إنترنت وأسهل)
+- أسهل وأصغر خيار عملي: تثبيت الحزمة الجاهزة من npm بشكل عالمي ثم تشغيل الخادم محلياً:
+  - سبب: الحزمة المنشورة عادةً تحتوي على ملفات مبنية/مضمّنة وتتفادى تحميل كل تبعيات التطوير الضخمة (playwright، electron، إلخ).
+
+أوامر — الخيار الموصّى (global npm, Bash)
+1) تأكد من Node مدعوم:
+   - مطلوب: Node >= 22.22.2 أو >=24 (يفضل Node 24).
+   - تحقق:
+     node -v
+
+2) ثبّت من npm (Bash / macOS / Linux):
+   npm install -g omniroute
+
+3) شغّل الخادم:
+   omniroute
+   الخادم يشتغل افتراضياً على http://localhost:20128
+
+4) اختبر بصورة سريعة:
+   curl http://localhost:20128/v1/chat/completions \
+     -H "Content-Type: application/json" \
+     -d '{"model":"auto","messages":[{"role":"user","content":"Hello!"}]}'
+
+أوامر — الخيار الموصّى (Windows PowerShell)
+1) تحقق من Node:
+   node -v
+2) ثبّت جلبياً:
+   npm install -g omniroute
+3) شغّل:
+   omniroute
+4) اختبر (PowerShell):
+   curl.exe http://localhost:20128/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"auto","messages":[{"role":"user","content":"Hello!"}]}'
+
+تقديرات حجم التنزيل والمساحة — تقريبية
+- إذا استخدمت npm install -g omniroute (الطريقة الموصى بها):
+  - تنزيل تقريبي: ~50–300 ميجابايت
+  - استهلاك قرص تقريبي بعد التثبيت: ~150–600 ميجابايت
+- إذا ثبتت من المصدر لكن فقط تبعيات التشغيل (no dev, no optional) مع تعطيل تنزيل متصفحات Playwright:
+  - تنزيل تقريبي: ~200–900 ميجابايت
+  - مساحة على القرص: ~300 ميجابايت — 1.5 جيجابايت
+- إذا ثبتت كل شيء (بيئة تطوير كاملة، Playwright، Electron، optional native binaries):
+  - تنزيل: 1.5 — 4+ جيجابايت
+  - مساحة على القرص: ≈2 — 6+ جيجابايت
+
+لماذا الفروقات؟ لأن بعض الحزم (playwright، electron، sharp، onnxruntime، better-sqlite3) تحمل ملفات ثنائية أو متصفحات قد تضيف مئات الميغابايتات لكلٍ منها.
+
+اگر تريد تشغيل من مصدر مع أقل إنترنت ممكن (إن كنت تود تعديل المشروع) — أوامر موفرة للنطاق
+(Bash / macOS / Linux)
+1) استنساخ repo:
+   git clone https://github.com/diegosouzapw/OmniRoute.git
+   cd OmniRoute
+2) تعطيل تنزيل متصفحات Playwright وتجنب الـ dev و optional:
+   export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+   npm install --no-optional --omit=dev
+   # أو إذا تفضّل pnpm:
+   # export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+   # pnpm install --prod --no-optional
+3) شغّل الخادم (production start):
+   npm run start
+
+(Windows PowerShell)
+1) git clone ... && cd OmniRoute
+2) تعيين متغير:
+   $env:PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
+   npm install --no-optional --omit=dev
+3) تشغيل:
+   npm run start
+
+أوامر مساعدة لمراقبة الحجم بعد التثبيت
+- على Linux/macOS:
+  du -sh node_modules
+- على PowerShell (Windows):
+  Get-ChildItem .\node_modules -Recurse | Measure-Object -Property Length -Sum
+
+نصائح إضافية لتقليل الإنترنت
+- استخدم npm install -g omniroute إن أردت تجربة سريعة — أقل تنزيل.
+- إذا كانت سرعة الإنترنت بطيئة: استخدم أمر مع PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 لتجنّب تنزيل متصفحات كبيرة.
+- تجنّب تثبيت devDependencies (omit=dev) وoptional (--no-optional).
+- بدلاً من تثبيت من المصدر، تثبيت الحزمة من npm يقلّل العمل لأنه يوفّر artifact مبني.
+
+هل تريد أن أزوّدك بأمر واحد منسق لتشغيل خطوة بخطوة حسب نظامك الآن؟ أخبرني: تستخدم Windows أم Linux/macOS؟ أجهز لك الأوامر الدقيقة التي تناسب جهازك.
